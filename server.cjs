@@ -404,13 +404,25 @@ function getPlaceholderImage(category) {
 function extractImageUrl(content) {
   if (!content) return null;
   
-  // Try to find img tags
-  const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i);
+  // Try to find img tags with various quote styles
+  const imgMatch = content.match(/<img[^>]+src=["']([^"'>]+)["']/i);
   if (imgMatch) return imgMatch[1];
   
   // Try to find background images
   const bgMatch = content.match(/background-image:\s*url\(['"]?([^'")\s]+)['"]?\)/i);
   if (bgMatch) return bgMatch[1];
+  
+  // Try to find data-src (lazy loading)
+  const dataSrcMatch = content.match(/<img[^>]+data-src=["']([^"'>]+)["']/i);
+  if (dataSrcMatch) return dataSrcMatch[1];
+  
+  // Try to find srcset (responsive images)
+  const srcsetMatch = content.match(/<img[^>]+srcset=["']([^"'>]+)["']/i);
+  if (srcsetMatch) {
+    // Extract the first URL from srcset
+    const firstUrl = srcsetMatch[1].split(',')[0].split(' ')[0];
+    if (firstUrl) return firstUrl;
+  }
   
   return null;
 }
@@ -472,19 +484,34 @@ async function fetchRSSFeed(source) {
 
       // Extract image from various sources
       let imageUrl = null;
+      
+      // Try media:content (RSS 2.0 with media extensions)
       if (item['media:content'] && item['media:content'][0] && item['media:content'][0].$) {
         imageUrl = item['media:content'][0].$.url;
-      } else if (item['media:thumbnail'] && item['media:thumbnail'][0] && item['media:thumbnail'][0].$) {
+      }
+      // Try media:thumbnail (RSS 2.0 with media extensions)
+      else if (item['media:thumbnail'] && item['media:thumbnail'][0] && item['media:thumbnail'][0].$) {
         imageUrl = item['media:thumbnail'][0].$.url;
-      } else if (item.enclosure && item.enclosure[0] && item.enclosure[0].$.type && item.enclosure[0].$.type.startsWith('image/')) {
+      }
+      // Try enclosure (RSS 2.0 standard)
+      else if (item.enclosure && item.enclosure[0] && item.enclosure[0].$.type && item.enclosure[0].$.type.startsWith('image/')) {
         imageUrl = item.enclosure[0].$.url;
-      } else {
+      }
+      // Try content:encoded (WordPress style)
+      else if (item['content:encoded'] && item['content:encoded'][0]) {
+        imageUrl = extractImageUrl(item['content:encoded'][0]);
+      }
+      // Try description
+      else if (description) {
         imageUrl = extractImageUrl(description);
       }
       
       // If no image found, use placeholder based on category
       if (!imageUrl) {
         imageUrl = getPlaceholderImage(source.category);
+        console.log(`📷 No image found for ${source.name} article, using placeholder`);
+      } else {
+        console.log(`📷 Found image for ${source.name} article: ${imageUrl.substring(0, 50)}...`);
       }
 
       return {
