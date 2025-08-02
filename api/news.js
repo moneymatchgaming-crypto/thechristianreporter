@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Sample Christian news data
+    // Sample Christian news data matching the frontend expectations
     const articles = [
       {
         id: '1',
@@ -19,7 +19,8 @@ export default async function handler(req, res) {
         source: 'Christian News Network',
         url: '#',
         publishedAt: new Date().toISOString(),
-        category: 'community'
+        category: 'community',
+        image: 'https://via.placeholder.com/400x250/059669/FFFFFF?text=Community'
       },
       {
         id: '2',
@@ -28,7 +29,8 @@ export default async function handler(req, res) {
         source: 'Faith Today',
         url: '#',
         publishedAt: new Date(Date.now() - 86400000).toISOString(),
-        category: 'ministry'
+        category: 'ministry',
+        image: 'https://via.placeholder.com/400x250/7C3AED/FFFFFF?text=Bible+Study'
       },
       {
         id: '3',
@@ -37,10 +39,32 @@ export default async function handler(req, res) {
         source: 'Christian Outreach',
         url: '#',
         publishedAt: new Date(Date.now() - 172800000).toISOString(),
-        category: 'missions'
+        category: 'missions',
+        image: 'https://via.placeholder.com/400x250/DC2626/FFFFFF?text=Missions'
+      },
+      {
+        id: '4',
+        title: 'Church Hosts Community Outreach Event',
+        description: 'Local congregation serves over 500 families in need.',
+        source: 'Christian Community News',
+        url: '#',
+        publishedAt: new Date(Date.now() - 259200000).toISOString(),
+        category: 'outreach',
+        image: 'https://via.placeholder.com/400x250/059669/FFFFFF?text=Outreach'
+      },
+      {
+        id: '5',
+        title: 'Youth Ministry Grows by 40%',
+        description: 'New programs attract young people to faith community.',
+        source: 'Youth Ministry Today',
+        url: '#',
+        publishedAt: new Date(Date.now() - 345600000).toISOString(),
+        category: 'youth',
+        image: 'https://via.placeholder.com/400x250/7C3AED/FFFFFF?text=Youth'
       }
     ];
 
+    // Return the data in the format the frontend expects
     res.status(200).json({ articles });
   } catch (error) {
     console.error('Error in news API:', error);
