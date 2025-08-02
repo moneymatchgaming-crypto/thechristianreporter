@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { NewsArticle, BibleVerse, CacheStatus } from '../types'
+import { NewsArticle, BibleVerse, CacheStatus, MinistryUpdate, PrayerRequest, ChurchEvent } from '../types'
 
 // API Configuration - using RSS2JSON like crypto-news
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
@@ -87,7 +87,7 @@ export const getNews = async (): Promise<NewsArticle[]> => {
           if (response.data && response.data.status === 'ok' && response.data.items) {
             return parseRSSFromJSON(response.data, feed, index);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.log(`Failed to fetch ${feed.name}:`, error.message);
         }
         return [];
@@ -107,7 +107,7 @@ export const getNews = async (): Promise<NewsArticle[]> => {
       console.log('⚠️ RSS2JSON API key not configured. Please add VITE_RSS2JSON_API_KEY to your environment variables.');
     }
     
-  } catch (error) {
+  } catch (error: any) {
     console.log('RSS2JSON API failed:', error.message);
   }
   
@@ -177,8 +177,8 @@ export const getNews = async (): Promise<NewsArticle[]> => {
       return allArticles;
     }
     
-  } catch (error) {
-    console.error('Error fetching news:', error);
+  } catch (error: any) {
+    console.error('Error fetching news:', error.message);
   }
   
   console.log('⚠️ All methods failed, using enhanced sample data');
@@ -486,6 +486,71 @@ export const getDailyVerse = async (): Promise<BibleVerse | null> => {
   ];
 
   return fallbackVerses[dayOfYear % fallbackVerses.length];
+};
+
+// Refresh daily verse (alias for getDailyVerse)
+export const refreshDailyVerse = async (): Promise<BibleVerse | null> => {
+  return getDailyVerse();
+};
+
+// Prayer Requests API - sample data
+export const getPrayerRequests = async (): Promise<PrayerRequest[]> => {
+  return [
+    {
+      id: '1',
+      title: 'Prayer for Healing',
+      description: 'Please pray for Sarah who is recovering from surgery.',
+      category: 'health',
+      urgency: 'high',
+      date: new Date().toISOString()
+    },
+    {
+      id: '2',
+      title: 'Mission Team Safety',
+      description: 'Praying for our mission team serving in Guatemala.',
+      category: 'missions',
+      urgency: 'medium',
+      date: new Date(Date.now() - 86400000).toISOString()
+    },
+    {
+      id: '3',
+      title: 'Family Reconciliation',
+      description: 'Praying for healing in family relationships.',
+      category: 'family',
+      urgency: 'medium',
+      date: new Date(Date.now() - 172800000).toISOString()
+    }
+  ];
+};
+
+// Ministry Updates API - sample data
+export const getMinistryUpdates = async (): Promise<MinistryUpdate[]> => {
+  return [
+    {
+      id: '1',
+      title: 'New Youth Ministry Program',
+      description: 'Launching a new program for teenagers.',
+      ministry: 'Youth Ministry',
+      date: new Date().toISOString(),
+      impact: 'local',
+      category: 'education'
+    }
+  ];
+};
+
+// Church Events API - sample data
+export const getChurchEvents = async (): Promise<ChurchEvent[]> => {
+  return [
+    {
+      id: '1',
+      title: 'Sunday Service',
+      description: 'Weekly worship service',
+      date: new Date().toISOString(),
+      location: 'Main Sanctuary',
+      church: 'First Christian Church',
+      type: 'service'
+    }
+  ];
 };
 
 // Enhanced sample news data
