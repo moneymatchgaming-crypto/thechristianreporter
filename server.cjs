@@ -357,44 +357,44 @@ function getPlaceholderImage(category) {
     'default': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop'
   };
   
-  // Array of local stained glass images
-  const stainedGlassImages = [
-    '/images/ChatGPT Image Jul 28, 2025, 10_16_15 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_14_19 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_13_13 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_10_37 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_08_46 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_06_56 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_05_24 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_03_28 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 10_01_49 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 09_59_59 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 09_28_38 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 09_19_15 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 09_14_59 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 08_58_13 PM.png',
-    '/images/ChatGPT Image Jul 28, 2025, 08_47_13 PM.png'
+  // Array of beautiful Christian-themed images from Unsplash
+  const christianImages = [
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1542810634-71277d95dcbb?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=400&fit=crop'
   ];
   
-  // Mix stained glass images with regular placeholders for all categories
+  // Mix Christian images with regular placeholders for all categories
   const allImages = [
-    ...stainedGlassImages,
+    ...christianImages,
     ...Object.values(placeholders)
   ];
   
-  // For church-themed categories, prioritize stained glass (70% chance)
+  // For church-themed categories, prioritize Christian images (70% chance)
   const churchThemedCategories = ['church', 'catholic', 'orthodox', 'methodist', 'episcopal', 'lutheran', 'ucc', 'adventist', 'pentecostal', 'faith', 'prayer', 'bible-study', 'theology', 'worship'];
   
   if (churchThemedCategories.includes(category.toLowerCase())) {
-    // 70% chance for stained glass, 30% for regular placeholders
+    // 70% chance for Christian images, 30% for regular placeholders
     if (Math.random() < 0.7) {
-      return stainedGlassImages[Math.floor(Math.random() * stainedGlassImages.length)];
+      return christianImages[Math.floor(Math.random() * christianImages.length)];
     }
   }
   
-  // For all categories, mix stained glass with regular images (30% chance for stained glass)
+  // For all categories, mix Christian images with regular images (30% chance for Christian images)
   if (Math.random() < 0.3) {
-    return stainedGlassImages[Math.floor(Math.random() * stainedGlassImages.length)];
+    return christianImages[Math.floor(Math.random() * christianImages.length)];
   }
   
   return placeholders[category.toLowerCase()] || placeholders.default;
