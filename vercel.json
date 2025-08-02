@@ -1,14 +1,5 @@
 {
-  "functions": {
-    "server.cjs": {
-      "maxDuration": 30
-    }
-  },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server.cjs"
-    },
     {
       "src": "/(.*)",
       "dest": "/dist/index.html"
