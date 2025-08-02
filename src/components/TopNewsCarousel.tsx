@@ -50,6 +50,13 @@ const TopNewsCarousel: React.FC<TopNewsCarouselProps> = ({ articles }) => {
 
   const currentArticle = articles[currentIndex];
 
+  // Debug image URLs
+  console.log('🎯 TopNewsCarousel - Current article:', {
+    title: currentArticle.title,
+    imageUrl: currentArticle.imageUrl,
+    hasImage: !!currentArticle.imageUrl
+  });
+
   return (
     <section 
       className="relative bg-white rounded-lg shadow-lg overflow-hidden"
@@ -65,8 +72,12 @@ const TopNewsCarousel: React.FC<TopNewsCarouselProps> = ({ articles }) => {
               alt={currentArticle.title}
               className="w-full h-full object-cover"
               onError={(e) => {
+                console.log('❌ Image failed to load:', currentArticle.imageUrl);
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
+              }}
+              onLoad={() => {
+                console.log('✅ Image loaded successfully:', currentArticle.imageUrl);
               }}
             />
           ) : (
