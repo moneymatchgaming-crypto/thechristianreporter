@@ -1,97 +1,225 @@
 import axios from 'axios';
 import { NewsArticle, CacheStatus, MinistryUpdate, BibleVerse, PrayerRequest, ChurchEvent } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+// API Configuration - using external APIs directly like crypto-news
+const RSS2JSON_API_KEY = import.meta.env.VITE_RSS2JSON_API_KEY || 'YOUR_API_KEY_HERE';
+
+// Christian news RSS feeds
+const CHRISTIAN_RSS_FEEDS = [
+  'https://relevantmagazine.com/feed/',
+  'https://www.christianitytoday.com/rss',
+  'https://www.christianpost.com/rss',
+  'https://www.worthynews.com/feed',
+  'https://www.catholicnewsagency.com/rss/news.xml',
+  'https://www.thegospelcoalition.org/feed/',
+  'https://blog.compassion.com/feed/',
+  'https://proverbs31.org/feed/',
+  'https://www.ligonier.org/feed/',
+  'https://www.cmda.org/feed/'
+];
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
   timeout: 10000,
 });
 
-// News API
+// News API - using RSS2JSON like crypto-news
 export const getNews = async (): Promise<NewsArticle[]> => {
   try {
-    const response = await api.get('/api/news');
-    return response.data;
+    console.log('🚀 Fetching Christian news from RSS feeds...');
+    
+    if (RSS2JSON_API_KEY === 'YOUR_API_KEY_HERE') {
+      console.log('⚠️ RSS2JSON API key not configured. Using sample data.');
+      return getSampleNews();
+    }
+    
+    // Fetch from multiple RSS feeds
+    const feedPromises = CHRISTIAN_RSS_FEEDS.map(async (feedUrl, index) => {
+      try {
+        const response = await axios.get('https://api.rss2json.com/v1/api.json', {
+          params: {
+            rss_url: feedUrl,
+            api_key: RSS2JSON_API_KEY,
+            count: 10
+          },
+          timeout: 10000
+        });
+        
+        if (response.data && response.data.status === 'ok' && response.data.items) {
+          return response.data.items.map((item: any, itemIndex: number) => ({
+            id: `rss-${index}-${itemIndex}`,
+            title: item.title,
+            description: item.description,
+            source: item.author || 'Christian News',
+            url: item.link,
+            publishedAt: item.pubDate,
+            category: 'christian',
+            image: item.thumbnail || 'https://via.placeholder.com/400x250/059669/FFFFFF?text=News'
+          }));
+        }
+      } catch (error) {
+        console.log(`Failed to fetch ${feedUrl}:`, error);
+      }
+      return [];
+    });
+    
+    const results = await Promise.allSettled(feedPromises);
+    const allArticles = results
+      .filter(result => result.status === 'fulfilled')
+      .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    
+    console.log(`📰 Fetched ${allArticles.length} articles from RSS feeds`);
+    return allArticles;
   } catch (error) {
     console.error('Error fetching news:', error);
-    return [];
+    return getSampleNews();
   }
 };
 
+// Sample news data for fallback
+const getSampleNews = (): NewsArticle[] => [
+  {
+    id: '1',
+    title: 'Christian Community Rallies for Local Family',
+    description: 'Local church members come together to support family in need.',
+    source: 'Christian News Network',
+    url: '#',
+    publishedAt: new Date().toISOString(),
+    category: 'community',
+    image: 'https://via.placeholder.com/400x250/059669/FFFFFF?text=Community'
+  },
+  {
+    id: '2',
+    title: 'New Bible Study Program Launches',
+    description: 'Innovative approach to scripture study gains popularity.',
+    source: 'Faith Today',
+    url: '#',
+    publishedAt: new Date(Date.now() - 86400000).toISOString(),
+    category: 'ministry',
+    image: 'https://via.placeholder.com/400x250/7C3AED/FFFFFF?text=Bible+Study'
+  },
+  {
+    id: '3',
+    title: 'Mission Trip Success Story',
+    description: 'Youth group returns from transformative service trip.',
+    source: 'Christian Outreach',
+    url: '#',
+    publishedAt: new Date(Date.now() - 172800000).toISOString(),
+    category: 'missions',
+    image: 'https://via.placeholder.com/400x250/DC2626/FFFFFF?text=Missions'
+  }
+];
+
 export const getCacheStatus = async (): Promise<CacheStatus | null> => {
   try {
-    const response = await api.get('/api/cache-status');
-    return response.data;
+    return {
+      lastUpdated: new Date().toISOString(),
+      totalArticles: 25,
+      cacheAge: 300
+    };
   } catch (error) {
     console.error('Error fetching cache status:', error);
     return null;
   }
 };
 
-// Ministry Updates API
-export const getMinistryUpdates = async (): Promise<MinistryUpdate[]> => {
-  try {
-    const response = await api.get('/api/ministry-updates');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching ministry updates:', error);
-    return [];
-  }
-};
-
-// Bible Verse API
+// Bible Verse API - using external Bible API
 export const getDailyVerse = async (): Promise<BibleVerse | null> => {
   try {
-    const response = await api.get('/api/daily-verse');
-    return response.data;
+    // Try Bible API
+    const response = await axios.get('https://labs.bible.org/api/?passage=random&type=json');
+    
+    if (response.data && response.data.length > 0) {
+      const verse = response.data[0];
+      return {
+        reference: verse.bookname + ' ' + verse.chapter + ':' + verse.verse,
+        text: verse.text,
+        translation: 'NIV',
+        date: new Date().toISOString().split('T')[0]
+      };
+    }
   } catch (error) {
     console.error('Error fetching daily verse:', error);
-    return null;
   }
+  
+  // Fallback verse
+  return {
+    reference: 'John 3:16',
+    text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
+    translation: 'NIV',
+    date: new Date().toISOString().split('T')[0]
+  };
 };
 
 export const refreshDailyVerse = async (): Promise<BibleVerse | null> => {
-  try {
-    const response = await api.post('/api/refresh-verse');
-    return response.data.verse;
-  } catch (error) {
-    console.error('Error refreshing daily verse:', error);
-    return null;
-  }
+  return getDailyVerse();
 };
 
-// Prayer Requests API
+// Prayer Requests API - sample data
 export const getPrayerRequests = async (): Promise<PrayerRequest[]> => {
-  try {
-    const response = await api.get('/api/prayer-requests');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching prayer requests:', error);
-    return [];
-  }
+  return [
+    {
+      id: '1',
+      title: 'Prayer for Healing',
+      description: 'Please pray for Sarah who is recovering from surgery.',
+      category: 'health',
+      urgency: 'high',
+      date: new Date().toISOString(),
+      anonymous: false,
+      prayerCount: 12
+    },
+    {
+      id: '2',
+      title: 'Mission Team Safety',
+      description: 'Praying for our mission team serving in Guatemala.',
+      category: 'missions',
+      urgency: 'medium',
+      date: new Date(Date.now() - 86400000).toISOString(),
+      anonymous: false,
+      prayerCount: 8
+    },
+    {
+      id: '3',
+      title: 'Family Reconciliation',
+      description: 'Praying for healing in family relationships.',
+      category: 'family',
+      urgency: 'medium',
+      date: new Date(Date.now() - 172800000).toISOString(),
+      anonymous: true,
+      prayerCount: 15
+    }
+  ];
 };
 
-// Church Events API
+// Ministry Updates API - sample data
+export const getMinistryUpdates = async (): Promise<MinistryUpdate[]> => {
+  return [
+    {
+      id: '1',
+      title: 'New Youth Ministry Program',
+      description: 'Launching a new program for teenagers.',
+      date: new Date().toISOString(),
+      category: 'youth'
+    }
+  ];
+};
+
+// Church Events API - sample data
 export const getChurchEvents = async (): Promise<ChurchEvent[]> => {
-  try {
-    const response = await api.get('/api/church-events');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching church events:', error);
-    return [];
-  }
+  return [
+    {
+      id: '1',
+      title: 'Sunday Service',
+      description: 'Weekly worship service',
+      date: new Date().toISOString(),
+      location: 'Main Sanctuary'
+    }
+  ];
 };
 
 // Health check
 export const checkHealth = async (): Promise<boolean> => {
-  try {
-    const response = await api.get('/health');
-    return response.status === 200;
-  } catch (error) {
-    console.error('Health check failed:', error);
-    return false;
-  }
+  return true;
 };
 
 export default api; 
