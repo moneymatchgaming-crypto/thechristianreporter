@@ -177,6 +177,8 @@ const parseRSSFeed = (xmlString: string, feed: any, feedIndex: number): NewsArti
   }
 };
 
+
+
 // Enhanced sample news data for fallback with more variety
 const getEnhancedSampleNews = (): NewsArticle[] => [
   {
