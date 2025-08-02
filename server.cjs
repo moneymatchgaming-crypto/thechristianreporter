@@ -474,6 +474,13 @@ async function fetchRSSFeed(source) {
       const link = item.link ? (Array.isArray(item.link) ? item.link[0] : item.link) : 
                   item.id ? (Array.isArray(item.id) ? item.id[0] : item.id) : '#';
       
+      // Debug link extraction
+      if (link && link !== '#') {
+        console.log(`🔗 Found link for ${source.name} article: ${link.substring(0, 50)}...`);
+      } else {
+        console.log(`❌ No valid link found for ${source.name} article`);
+      }
+      
       const pubDate = item.pubDate ? (Array.isArray(item.pubDate) ? item.pubDate[0] : item.pubDate) :
                      item.published ? (Array.isArray(item.published) ? item.published[0] : item.published) :
                      item.updated ? (Array.isArray(item.updated) ? item.updated[0] : item.updated) :
