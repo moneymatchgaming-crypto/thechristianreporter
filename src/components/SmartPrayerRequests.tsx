@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Clock, AlertCircle, Heart, TrendingUp, Mail, Plus, X } from 'lucide-react';
+import { Users, Clock, AlertCircle, Heart, TrendingUp, Plus, X } from 'lucide-react';
 
 interface PrayerRequest {
   id: string;
@@ -79,10 +79,10 @@ const SmartPrayerRequests: React.FC = () => {
 
         // Merge server status with localStorage for better UX
         const savedPrayedRequests = localStorage.getItem('prayedRequests');
-        const localPrayedRequests = savedPrayedRequests ? new Set(JSON.parse(savedPrayedRequests)) : new Set();
+        const localPrayedRequests = savedPrayedRequests ? new Set(JSON.parse(savedPrayedRequests) as string[]) : new Set<string>();
         
         // Combine server and local data
-        const combinedPrayedRequests = new Set([...serverPrayedRequests, ...localPrayedRequests]);
+        const combinedPrayedRequests = new Set<string>([...Array.from(serverPrayedRequests as Set<string>), ...Array.from(localPrayedRequests as Set<string>)]);
         setPrayedRequests(combinedPrayedRequests);
         
         // Update localStorage with server data

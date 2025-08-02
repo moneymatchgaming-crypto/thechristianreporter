@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Shield, ExternalLink, Mail, Phone } from 'lucide-react';
+import { Heart, Shield, ExternalLink, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();

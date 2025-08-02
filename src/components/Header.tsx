@@ -1,9 +1,9 @@
 import React from 'react';
 import { CacheStatus } from '../types';
-import { RefreshCw, BookOpen, Heart, Users, Calendar } from 'lucide-react';
+import { RefreshCw, BookOpen, Users, Calendar } from 'lucide-react';
 
 interface HeaderProps {
-  cacheStatus: CacheStatus | null;
+  cacheStatus?: CacheStatus | null;
 }
 
 const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {

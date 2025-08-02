@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Heart, Share2, MessageCircle, ExternalLink, Youtube, Music } from 'lucide-react';
+import { Play, Heart, MessageCircle, ExternalLink, Youtube, Music } from 'lucide-react';
 
 interface SocialMediaPost {
   id: string;
@@ -21,7 +21,7 @@ interface SocialMediaPost {
 const ChristianSocialMedia: React.FC = () => {
   const [posts, setPosts] = useState<SocialMediaPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'youtube'>('all');
+  const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'youtube' | 'tiktok'>('all');
   const [apiQuotaExceeded, setApiQuotaExceeded] = useState(false);
 
   useEffect(() => {
