@@ -27,49 +27,83 @@ export const getNews = async (): Promise<NewsArticle[]> => {
   try {
     console.log('🚀 Fetching Christian news from RSS feeds...');
     
-    if (RSS2JSON_API_KEY === 'YOUR_API_KEY_HERE') {
-      console.log('⚠️ RSS2JSON API key not configured. Using sample data.');
-      return getSampleNews();
+    // First try RSS2JSON with API key
+    if (RSS2JSON_API_KEY !== 'YOUR_API_KEY_HERE') {
+      console.log('🔑 Using RSS2JSON API with key...');
+      
+      // Fetch from multiple RSS feeds
+      const feedPromises = CHRISTIAN_RSS_FEEDS.map(async (feedUrl, index) => {
+        try {
+          const response = await axios.get('https://api.rss2json.com/v1/api.json', {
+            params: {
+              rss_url: feedUrl,
+              api_key: RSS2JSON_API_KEY,
+              count: 10
+            },
+            timeout: 10000
+          });
+          
+          if (response.data && response.data.status === 'ok' && response.data.items) {
+            console.log(`✅ Successfully fetched from ${feedUrl}: ${response.data.items.length} articles`);
+            return response.data.items.map((item: any, itemIndex: number) => ({
+              id: `rss-${index}-${itemIndex}`,
+              title: item.title,
+              description: item.description,
+              link: item.link,
+              pubDate: item.pubDate,
+              source: item.author || 'Christian News',
+              category: 'christian',
+              imageUrl: item.thumbnail || 'https://via.placeholder.com/400x250/059669/FFFFFF?text=News'
+            }));
+          }
+        } catch (error) {
+          console.log(`❌ Failed to fetch ${feedUrl}:`, error);
+        }
+        return [];
+      });
+      
+      const results = await Promise.allSettled(feedPromises);
+      const allArticles = results
+        .filter(result => result.status === 'fulfilled')
+        .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
+        .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+      
+      if (allArticles.length > 0) {
+        console.log(`📰 Fetched ${allArticles.length} articles from RSS feeds`);
+        return allArticles;
+      }
     }
     
-    // Fetch from multiple RSS feeds
-    const feedPromises = CHRISTIAN_RSS_FEEDS.map(async (feedUrl, index) => {
-      try {
-        const response = await axios.get('https://api.rss2json.com/v1/api.json', {
-          params: {
-            rss_url: feedUrl,
-            api_key: RSS2JSON_API_KEY,
-            count: 10
-          },
-          timeout: 10000
-        });
-        
-        if (response.data && response.data.status === 'ok' && response.data.items) {
-          return response.data.items.map((item: any, itemIndex: number) => ({
-            id: `rss-${index}-${itemIndex}`,
-            title: item.title,
-            description: item.description,
-            link: item.link,
-            pubDate: item.pubDate,
-            source: item.author || 'Christian News',
-            category: 'christian',
-            imageUrl: item.thumbnail || 'https://via.placeholder.com/400x250/059669/FFFFFF?text=News'
-          }));
-        }
-      } catch (error) {
-        console.log(`Failed to fetch ${feedUrl}:`, error);
+    // Fallback: Try RSS2JSON without API key (limited but works)
+    console.log('🔄 Trying RSS2JSON without API key...');
+    try {
+      const response = await axios.get('https://api.rss2json.com/v1/api.json', {
+        params: {
+          rss_url: 'https://relevantmagazine.com/feed/',
+          count: 5
+        },
+        timeout: 10000
+      });
+      
+      if (response.data && response.data.status === 'ok' && response.data.items) {
+        console.log(`✅ Successfully fetched from Relevant Magazine: ${response.data.items.length} articles`);
+        return response.data.items.map((item: any, index: number) => ({
+          id: `rss-fallback-${index}`,
+          title: item.title,
+          description: item.description,
+          link: item.link,
+          pubDate: item.pubDate,
+          source: item.author || 'Relevant Magazine',
+          category: 'christian',
+          imageUrl: item.thumbnail || 'https://via.placeholder.com/400x250/059669/FFFFFF?text=News'
+        }));
       }
-      return [];
-    });
+    } catch (error) {
+      console.log('❌ RSS2JSON without API key also failed:', error);
+    }
     
-    const results = await Promise.allSettled(feedPromises);
-    const allArticles = results
-      .filter(result => result.status === 'fulfilled')
-      .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
-      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-    
-    console.log(`📰 Fetched ${allArticles.length} articles from RSS feeds`);
-    return allArticles;
+    console.log('⚠️ All RSS methods failed, using sample data');
+    return getSampleNews();
   } catch (error) {
     console.error('Error fetching news:', error);
     return getSampleNews();
