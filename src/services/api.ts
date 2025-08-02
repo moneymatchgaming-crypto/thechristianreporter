@@ -49,11 +49,11 @@ export const getNews = async (): Promise<NewsArticle[]> => {
             id: `rss-${index}-${itemIndex}`,
             title: item.title,
             description: item.description,
+            link: item.link,
+            pubDate: item.pubDate,
             source: item.author || 'Christian News',
-            url: item.link,
-            publishedAt: item.pubDate,
             category: 'christian',
-            image: item.thumbnail || 'https://via.placeholder.com/400x250/059669/FFFFFF?text=News'
+            imageUrl: item.thumbnail || 'https://via.placeholder.com/400x250/059669/FFFFFF?text=News'
           }));
         }
       } catch (error) {
@@ -66,7 +66,7 @@ export const getNews = async (): Promise<NewsArticle[]> => {
     const allArticles = results
       .filter(result => result.status === 'fulfilled')
       .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
     
     console.log(`📰 Fetched ${allArticles.length} articles from RSS feeds`);
     return allArticles;
@@ -82,31 +82,31 @@ const getSampleNews = (): NewsArticle[] => [
     id: '1',
     title: 'Christian Community Rallies for Local Family',
     description: 'Local church members come together to support family in need.',
+    link: '#',
+    pubDate: new Date().toISOString(),
     source: 'Christian News Network',
-    url: '#',
-    publishedAt: new Date().toISOString(),
     category: 'community',
-    image: 'https://via.placeholder.com/400x250/059669/FFFFFF?text=Community'
+    imageUrl: 'https://via.placeholder.com/400x250/059669/FFFFFF?text=Community'
   },
   {
     id: '2',
     title: 'New Bible Study Program Launches',
     description: 'Innovative approach to scripture study gains popularity.',
+    link: '#',
+    pubDate: new Date(Date.now() - 86400000).toISOString(),
     source: 'Faith Today',
-    url: '#',
-    publishedAt: new Date(Date.now() - 86400000).toISOString(),
     category: 'ministry',
-    image: 'https://via.placeholder.com/400x250/7C3AED/FFFFFF?text=Bible+Study'
+    imageUrl: 'https://via.placeholder.com/400x250/7C3AED/FFFFFF?text=Bible+Study'
   },
   {
     id: '3',
     title: 'Mission Trip Success Story',
     description: 'Youth group returns from transformative service trip.',
+    link: '#',
+    pubDate: new Date(Date.now() - 172800000).toISOString(),
     source: 'Christian Outreach',
-    url: '#',
-    publishedAt: new Date(Date.now() - 172800000).toISOString(),
     category: 'missions',
-    image: 'https://via.placeholder.com/400x250/DC2626/FFFFFF?text=Missions'
+    imageUrl: 'https://via.placeholder.com/400x250/DC2626/FFFFFF?text=Missions'
   }
 ];
 
@@ -115,7 +115,8 @@ export const getCacheStatus = async (): Promise<CacheStatus | null> => {
     return {
       lastUpdated: new Date().toISOString(),
       totalArticles: 25,
-      cacheAge: 300
+      sourcesCount: 10,
+      nextUpdate: new Date(Date.now() + 300000).toISOString()
     };
   } catch (error) {
     console.error('Error fetching cache status:', error);
@@ -134,8 +135,7 @@ export const getDailyVerse = async (): Promise<BibleVerse | null> => {
       return {
         reference: verse.bookname + ' ' + verse.chapter + ':' + verse.verse,
         text: verse.text,
-        translation: 'NIV',
-        date: new Date().toISOString().split('T')[0]
+        translation: 'NIV'
       };
     }
   } catch (error) {
@@ -146,8 +146,7 @@ export const getDailyVerse = async (): Promise<BibleVerse | null> => {
   return {
     reference: 'John 3:16',
     text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
-    translation: 'NIV',
-    date: new Date().toISOString().split('T')[0]
+    translation: 'NIV'
   };
 };
 
@@ -164,9 +163,7 @@ export const getPrayerRequests = async (): Promise<PrayerRequest[]> => {
       description: 'Please pray for Sarah who is recovering from surgery.',
       category: 'health',
       urgency: 'high',
-      date: new Date().toISOString(),
-      anonymous: false,
-      prayerCount: 12
+      date: new Date().toISOString()
     },
     {
       id: '2',
@@ -174,9 +171,7 @@ export const getPrayerRequests = async (): Promise<PrayerRequest[]> => {
       description: 'Praying for our mission team serving in Guatemala.',
       category: 'missions',
       urgency: 'medium',
-      date: new Date(Date.now() - 86400000).toISOString(),
-      anonymous: false,
-      prayerCount: 8
+      date: new Date(Date.now() - 86400000).toISOString()
     },
     {
       id: '3',
@@ -184,9 +179,7 @@ export const getPrayerRequests = async (): Promise<PrayerRequest[]> => {
       description: 'Praying for healing in family relationships.',
       category: 'family',
       urgency: 'medium',
-      date: new Date(Date.now() - 172800000).toISOString(),
-      anonymous: true,
-      prayerCount: 15
+      date: new Date(Date.now() - 172800000).toISOString()
     }
   ];
 };
@@ -198,8 +191,10 @@ export const getMinistryUpdates = async (): Promise<MinistryUpdate[]> => {
       id: '1',
       title: 'New Youth Ministry Program',
       description: 'Launching a new program for teenagers.',
+      ministry: 'Youth Ministry',
       date: new Date().toISOString(),
-      category: 'youth'
+      impact: 'local',
+      category: 'education'
     }
   ];
 };
@@ -212,7 +207,9 @@ export const getChurchEvents = async (): Promise<ChurchEvent[]> => {
       title: 'Sunday Service',
       description: 'Weekly worship service',
       date: new Date().toISOString(),
-      location: 'Main Sanctuary'
+      location: 'Main Sanctuary',
+      church: 'First Christian Church',
+      type: 'service'
     }
   ];
 };
