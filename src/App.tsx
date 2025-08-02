@@ -12,20 +12,24 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Disclaimer from './pages/Disclaimer';
 import { NewsArticle } from './types';
+import { getNews } from './services/api';
 
 // Main Home Page Component
 const HomePage: React.FC = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchNews = async () => {
     try {
-      const response = await fetch('/api/news?limit=100'); // Request 100 articles instead of default 12
-      if (response.ok) {
-        const data = await response.json();
-        setArticles(data.articles || data || []);
-      }
+      setLoading(true);
+      console.log('📰 App: Fetching news for jumbotron...');
+      const newsArticles = await getNews();
+      setArticles(newsArticles);
+      console.log('📰 App: Loaded', newsArticles.length, 'articles for jumbotron');
     } catch (err) {
       console.error('Error fetching news:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,7 +53,7 @@ const HomePage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content - Takes 2/3 width */}
         <div className="lg:col-span-2 space-y-8">
-          <NewsFeed />
+          <NewsFeed articles={articles} loading={loading} />
         </div>
         
         {/* Sidebar - Takes 1/3 width */}

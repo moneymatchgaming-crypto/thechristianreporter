@@ -1,48 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { NewsArticle } from '../types';
 import NewsCard from './NewsCard';
-import { ChevronDown } from 'lucide-react';
-import { getNews } from '../services/api';
 
-const NewsFeed: React.FC = () => {
-  const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+interface NewsFeedProps {
+  articles: NewsArticle[];
+  loading: boolean;
+}
 
-  const fetchArticles = async (pageNum: number) => {
-    try {
-      setLoading(true);
-      console.log('📰 NewsFeed: Fetching articles...');
-      
-      // Use the new API service instead of calling /api/news
-      const articles = await getNews();
-      
-      if (pageNum === 1) {
-        setArticles(articles);
-      } else {
-        setArticles(prev => [...prev, ...articles]);
-      }
-      
-      // For now, just show all articles (no pagination)
-      setHasMore(false);
-      console.log('📰 NewsFeed: Loaded', articles.length, 'articles');
-    } catch (err) {
-      console.error('Error fetching news:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const NewsFeed: React.FC<NewsFeedProps> = ({ articles, loading }) => {
 
-  useEffect(() => {
-    fetchArticles(1);
-  }, []);
-
-  const handleLoadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchArticles(nextPage);
-  };
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading news articles...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -53,17 +29,9 @@ const NewsFeed: React.FC = () => {
         ))}
       </div>
 
-      {/* Load More Button */}
-      {hasMore && (
-        <div className="text-center mt-8">
-          <button
-            onClick={handleLoadMore}
-            disabled={loading}
-            className="flex items-center space-x-2 px-6 py-3 text-sm font-medium text-purple-600 hover:text-purple-800 bg-purple-200 hover:bg-purple-300 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mx-auto border border-purple-300"
-          >
-            <ChevronDown className="w-4 h-4" />
-            <span>{loading ? 'Loading...' : 'Load More Articles'}</span>
-          </button>
+      {articles.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-600">No articles available at the moment.</p>
         </div>
       )}
     </div>
