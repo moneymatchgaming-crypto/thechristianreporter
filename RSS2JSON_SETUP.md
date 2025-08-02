@@ -26,7 +26,7 @@ VITE_RSS2JSON_API_KEY=your_api_key_here
 
 ## Step 3: Test the Setup
 
-The site will now fetch real news from 40+ Christian RSS feeds! If the API key is not configured, it will fall back to sample data.
+The site will now fetch real Christian news from RSS feeds! If the API key is not configured, it will fall back to CORS proxies.
 
 ## Pricing
 - **Free tier**: 1,000 requests per day
@@ -35,11 +35,4 @@ The site will now fetch real news from 40+ Christian RSS feeds! If the API key i
 ## Troubleshooting
 - If you see "API key not configured" in the console, make sure you've added the environment variable
 - If you get rate limit errors, consider upgrading to a paid plan
-- The site will automatically fall back to sample data if RSS2JSON fails
-
-## RSS Sources Included
-- Relevant Magazine, Christianity Today, Christian Post
-- Gospel Coalition, Focus on the Family, Charisma News
-- World Vision, Samaritan's Purse, IMB, YWAM
-- Proverbs 31, Lysa TerKeurst, She Reads Truth
-- And many more Christian news sources 
+- The site will automatically fall back to CORS proxies if RSS2JSON fails 
