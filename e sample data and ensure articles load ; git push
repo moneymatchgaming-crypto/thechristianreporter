@@ -1,0 +1,10 @@
+[33m435251a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m Fix API port configuration and finalize image system updates
+[33m4f17217[m Fix TypeScript errors for Vercel deployment
+[33m65bff4a[m Enhanced image extraction system with rotation and fixed broken images
+[33mcca5bed[m Fix jumbotron to never show gradient fallback - Remove black and white gradient completely - Always show proper images for jumbotron - Add category-specific image fallbacks - Faith category uses stained glass image - Better error handling with fallback images
+[33m279aede[m Fix faith category with working stained glass URLs - Replace 404 URLs with working stained glass images - Add large church stained glass window and horse decor images - Ensure faith articles get proper stained glass options
+[33m76aa5c0[m Add stained glass images to all categories - Mix original category images with stained glass options - Each category now has 1 original + 2 stained glass images - Faith category includes stained glass mosaic and roofing images
+[33mf8d0077[m Add image variety tracking - Avoid using same image twice in a row within same category - Track last used image per category - Ensure variety and no repetition in image selection
+[33madd7bbd[m Fix image selection to be deterministic - Use article ID to select different images for each article - Each article will get a different image instead of same random selection - Faith articles should now show different stained glass images
+[33ma24f92c[m Add debugging to image selection - Log which image index is being selected for each category - Help identify why stained glass images aren't showing up
+[33m3d5afa1[m Add faith category with stained glass defaults - Faith category now uses stained glass images as primary fallbacks - Should show beautiful stained glass images for faith-related articles
