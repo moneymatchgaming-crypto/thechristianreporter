@@ -28,7 +28,7 @@ const getFallbackImage = (category: string): string => {
   ];
   
   // Category-specific placeholders
-  const placeholders = {
+  const placeholders: { [key: string]: string } = {
     'church': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop',
     'ministry': 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=400&fit=crop',
     'youth': 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=400&fit=crop',
@@ -157,7 +157,7 @@ const TopNewsCarousel: React.FC<TopNewsCarouselProps> = ({ articles }) => {
             src={displayImageUrl} 
             alt={currentArticle.title}
             className="w-full h-full object-cover"
-            onError={(e) => {
+            onError={() => {
               console.log('❌ Image failed to load:', displayImageUrl);
               setImageError(prev => ({ ...prev, [currentArticle.id]: true }));
             }}
