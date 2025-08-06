@@ -52,7 +52,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ selectedCategory }) => {
 
   // Filter articles based on selected category
   useEffect(() => {
-    if (!selectedCategory) {
+    if (!selectedCategory || selectedCategory === 'news') {
       setFilteredArticles(articles);
       return;
     }
@@ -78,14 +78,14 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ selectedCategory }) => {
   };
 
   const getSelectedCategoryName = () => {
-    if (!selectedCategory) return null;
+    if (!selectedCategory || selectedCategory === 'news') return null;
     return categoryGroups.find(group => group.id === selectedCategory)?.name;
   };
 
   return (
     <div className="space-y-6">
       {/* Filter Indicator */}
-      {selectedCategory && (
+      {selectedCategory && selectedCategory !== 'news' && (
         <div className="flex items-center space-x-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <Filter className="w-4 h-4 text-blue-600" />
           <span className="text-sm font-medium text-blue-800">

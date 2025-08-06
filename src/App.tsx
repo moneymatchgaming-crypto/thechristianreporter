@@ -37,7 +37,7 @@ const HomePage: React.FC<{ selectedCategory?: string }> = ({ selectedCategory })
 
   // Filter articles based on selected category group
   useEffect(() => {
-    if (!selectedCategory) {
+    if (!selectedCategory || selectedCategory === 'news') {
       setFilteredArticles(articles);
       return;
     }
@@ -87,7 +87,7 @@ const HomePage: React.FC<{ selectedCategory?: string }> = ({ selectedCategory })
 };
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+  const [selectedCategory, setSelectedCategory] = useState<string>('news');
 
   const handleCategorySelect = (categoryId: string) => {
     console.log('🎯 Category selected:', categoryId);

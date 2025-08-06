@@ -11,6 +11,14 @@ export interface CategoryGroup {
 
 export const categoryGroups: CategoryGroup[] = [
   {
+    id: 'news',
+    name: 'News',
+    description: 'All news articles',
+    color: 'gray',
+    icon: 'book-open',
+    categories: [] // Empty array means show all categories
+  },
+  {
     id: 'faith-church',
     name: 'Faith & Church',
     description: 'Church news, theology, and spiritual content',

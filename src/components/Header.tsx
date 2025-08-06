@@ -21,6 +21,8 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus, selectedCategory, onCatego
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
+      case 'book-open':
+        return <BookOpen className="w-4 h-4" />;
       case 'cross':
         return <Cross className="w-4 h-4" />;
       case 'users':
@@ -41,6 +43,8 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus, selectedCategory, onCatego
     const selectedClasses = "font-semibold";
     
     switch (color) {
+      case 'gray':
+        return `${baseClasses} ${isSelected ? 'text-gray-700' : 'text-gray-600 hover:text-gray-800'} ${isSelected ? selectedClasses : ''}`;
       case 'primary':
         return `${baseClasses} ${isSelected ? 'text-primary-700' : 'text-primary-600 hover:text-primary-800'} ${isSelected ? selectedClasses : ''}`;
       case 'gold':
@@ -56,25 +60,35 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus, selectedCategory, onCatego
     }
   };
 
+  const handleLogoClick = () => {
+    onCategorySelect?.('news');
+  };
+
   return (
     <header className="bg-white shadow-lg border-b border-primary-200">
       <div className="container mx-auto px-4 py-6">
         {/* Main Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-6">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <div className="cross-glow">
-              <svg className="w-12 h-12 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 font-serif">
-                The Christian Reporter
-              </h1>
-              <p className="text-gray-600 text-sm">
-                Faith-based news & Christian content
-              </p>
-            </div>
+            <button 
+              onClick={handleLogoClick}
+              className="flex items-center space-x-4 hover:opacity-80 transition-opacity cursor-pointer"
+              title="Click to view all news"
+            >
+              <div className="cross-glow">
+                <svg className="w-12 h-12 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 font-serif">
+                  The Christian Reporter
+                </h1>
+                <p className="text-gray-600 text-sm">
+                  Faith-based news & Christian content
+                </p>
+              </div>
+            </button>
           </div>
 
           {/* Cache Status */}
