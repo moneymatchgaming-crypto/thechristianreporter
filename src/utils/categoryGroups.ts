@@ -48,7 +48,7 @@ export const categoryGroups: CategoryGroup[] = [
     color: 'red',
     icon: 'globe',
     categories: [
-      'world', 'israel', 'regional', 'us', 'politics', 'entertainment'
+      'world', 'israel', 'regional', 'us', 'politics', 'entertainment', 'news'
     ]
   },
   {
@@ -68,7 +68,7 @@ export const categoryGroups: CategoryGroup[] = [
     color: 'blue',
     icon: 'briefcase',
     categories: [
-      'finance', 'research', 'news', 'default'
+      'finance', 'research', 'default'
     ]
   }
 ];
