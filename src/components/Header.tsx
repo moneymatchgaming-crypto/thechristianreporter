@@ -1,6 +1,6 @@
 import React from 'react';
 import { CacheStatus } from '../types';
-import { RefreshCw, BookOpen, Cross, Users, Globe, Heart, Briefcase } from 'lucide-react';
+import { RefreshCw, BookOpen, Cross, Users, Globe, Heart } from 'lucide-react';
 import { categoryGroups } from '../utils/categoryGroups';
 
 interface HeaderProps {
@@ -31,8 +31,6 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus, selectedCategory, onCatego
         return <Globe className="w-4 h-4" />;
       case 'heart':
         return <Heart className="w-4 h-4" />;
-      case 'briefcase':
-        return <Briefcase className="w-4 h-4" />;
       default:
         return <BookOpen className="w-4 h-4" />;
     }
@@ -53,8 +51,6 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus, selectedCategory, onCatego
         return `${baseClasses} ${isSelected ? 'text-red-700' : 'text-red-600 hover:text-red-800'} ${isSelected ? selectedClasses : ''}`;
       case 'green':
         return `${baseClasses} ${isSelected ? 'text-green-700' : 'text-green-600 hover:text-green-800'} ${isSelected ? selectedClasses : ''}`;
-      case 'blue':
-        return `${baseClasses} ${isSelected ? 'text-blue-700' : 'text-blue-600 hover:text-blue-800'} ${isSelected ? selectedClasses : ''}`;
       default:
         return `${baseClasses} ${isSelected ? 'text-gray-700' : 'text-gray-600 hover:text-gray-800'} ${isSelected ? selectedClasses : ''}`;
     }

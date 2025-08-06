@@ -44,11 +44,11 @@ export const categoryGroups: CategoryGroup[] = [
   {
     id: 'global-politics',
     name: 'Global & Politics',
-    description: 'World news, politics, and international events',
+    description: 'World news, politics, business, and international events',
     color: 'red',
     icon: 'globe',
     categories: [
-      'world', 'israel', 'regional', 'us', 'politics', 'entertainment', 'news'
+      'world', 'israel', 'regional', 'us', 'politics', 'entertainment', 'news', 'finance', 'research', 'default'
     ]
   },
   {
@@ -59,16 +59,6 @@ export const categoryGroups: CategoryGroup[] = [
     icon: 'heart',
     categories: [
       'family', 'lifestyle', 'health', 'culture', 'music', 'writing'
-    ]
-  },
-  {
-    id: 'business-general',
-    name: 'Business & General',
-    description: 'Finance, research, and general news',
-    color: 'blue',
-    icon: 'briefcase',
-    categories: [
-      'finance', 'research', 'default'
     ]
   }
 ];
@@ -83,8 +73,8 @@ export const getCategoryGroup = (category: string): CategoryGroup => {
     }
   }
   
-  // Default to business-general if category not found
-  return categoryGroups.find(group => group.id === 'business-general')!;
+  // Default to global-politics if category not found
+  return categoryGroups.find(group => group.id === 'global-politics')!;
 };
 
 // Helper function to get all categories in a group
