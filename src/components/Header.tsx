@@ -1,12 +1,15 @@
 import React from 'react';
 import { CacheStatus } from '../types';
-import { RefreshCw, BookOpen, Users, Calendar } from 'lucide-react';
+import { RefreshCw, BookOpen, Cross, Users, Globe, Heart, Briefcase } from 'lucide-react';
+import { categoryGroups } from '../utils/categoryGroups';
 
 interface HeaderProps {
   cacheStatus?: CacheStatus | null;
+  selectedCategory?: string;
+  onCategorySelect?: (categoryId: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
+const Header: React.FC<HeaderProps> = ({ cacheStatus, selectedCategory, onCategorySelect }) => {
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { 
@@ -14,6 +17,43 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
       minute: '2-digit',
       hour12: true 
     });
+  };
+
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'cross':
+        return <Cross className="w-4 h-4" />;
+      case 'users':
+        return <Users className="w-4 h-4" />;
+      case 'globe':
+        return <Globe className="w-4 h-4" />;
+      case 'heart':
+        return <Heart className="w-4 h-4" />;
+      case 'briefcase':
+        return <Briefcase className="w-4 h-4" />;
+      default:
+        return <BookOpen className="w-4 h-4" />;
+    }
+  };
+
+  const getColorClasses = (color: string, isSelected: boolean) => {
+    const baseClasses = "flex items-center space-x-2 transition-colors";
+    const selectedClasses = "font-semibold";
+    
+    switch (color) {
+      case 'primary':
+        return `${baseClasses} ${isSelected ? 'text-primary-700' : 'text-primary-600 hover:text-primary-800'} ${isSelected ? selectedClasses : ''}`;
+      case 'gold':
+        return `${baseClasses} ${isSelected ? 'text-gold-700' : 'text-gold-600 hover:text-gold-800'} ${isSelected ? selectedClasses : ''}`;
+      case 'red':
+        return `${baseClasses} ${isSelected ? 'text-red-700' : 'text-red-600 hover:text-red-800'} ${isSelected ? selectedClasses : ''}`;
+      case 'green':
+        return `${baseClasses} ${isSelected ? 'text-green-700' : 'text-green-600 hover:text-green-800'} ${isSelected ? selectedClasses : ''}`;
+      case 'blue':
+        return `${baseClasses} ${isSelected ? 'text-blue-700' : 'text-blue-600 hover:text-blue-800'} ${isSelected ? selectedClasses : ''}`;
+      default:
+        return `${baseClasses} ${isSelected ? 'text-gray-700' : 'text-gray-600 hover:text-gray-800'} ${isSelected ? selectedClasses : ''}`;
+    }
   };
 
   return (
@@ -52,26 +92,19 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
           )}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-wrap items-center justify-center space-x-8 text-sm font-medium">
-          <a href="#news" className="flex items-center space-x-2 text-primary-700 hover:text-primary-900 transition-colors">
-            <BookOpen className="w-4 h-4" />
-            <span>News</span>
-          </a>
-          <a href="#prayer" className="flex items-center space-x-2 text-gold-700 hover:text-gold-900 transition-colors">
-            <Users className="w-4 h-4" />
-            <span>Prayer</span>
-          </a>
-          <a href="#social-media" className="flex items-center space-x-2 text-red-600 hover:text-red-800 transition-colors">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-            <span>Social Media</span>
-          </a>
-          <a href="#events" className="flex items-center space-x-2 text-primary-700 hover:text-primary-900 transition-colors">
-            <Calendar className="w-4 h-4" />
-            <span>Events</span>
-          </a>
+        {/* Category Navigation */}
+        <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm font-medium">
+          {categoryGroups.map((group) => (
+            <button
+              key={group.id}
+              onClick={() => onCategorySelect?.(group.id)}
+              className={getColorClasses(group.color, selectedCategory === group.id)}
+              title={group.description}
+            >
+              {getIcon(group.icon)}
+              <span>{group.name}</span>
+            </button>
+          ))}
         </nav>
       </div>
     </header>

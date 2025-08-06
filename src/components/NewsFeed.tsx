@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { NewsArticle } from '../types';
 import NewsCard from './NewsCard';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Filter } from 'lucide-react';
 import { getNews } from '../services/api';
+import { getCategoriesInGroup, categoryGroups } from '../utils/categoryGroups';
 
-const NewsFeed: React.FC = () => {
+interface NewsFeedProps {
+  selectedCategory?: string;
+}
+
+const NewsFeed: React.FC<NewsFeedProps> = ({ selectedCategory }) => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -44,23 +50,59 @@ const NewsFeed: React.FC = () => {
     fetchArticles(1);
   }, []);
 
+  // Filter articles based on selected category
+  useEffect(() => {
+    if (!selectedCategory) {
+      setFilteredArticles(articles);
+      return;
+    }
+
+    const categoriesInGroup = getCategoriesInGroup(selectedCategory);
+    const filtered = articles.filter(article => 
+      categoriesInGroup.includes(article.category.toLowerCase())
+    );
+    
+    console.log(`🎯 NewsFeed: Filtering articles for category group "${selectedCategory}":`, {
+      totalArticles: articles.length,
+      filteredCount: filtered.length,
+      categoriesInGroup
+    });
+    
+    setFilteredArticles(filtered);
+  }, [articles, selectedCategory]);
+
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     fetchArticles(nextPage);
   };
 
+  const getSelectedCategoryName = () => {
+    if (!selectedCategory) return null;
+    return categoryGroups.find(group => group.id === selectedCategory)?.name;
+  };
+
   return (
     <div className="space-y-6">
+      {/* Filter Indicator */}
+      {selectedCategory && (
+        <div className="flex items-center space-x-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <Filter className="w-4 h-4 text-blue-600" />
+          <span className="text-sm font-medium text-blue-800">
+            Showing articles from: <span className="font-semibold">{getSelectedCategoryName()}</span>
+          </span>
+        </div>
+      )}
+
       {/* News Grid Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {articles.map((article) => (
+        {filteredArticles.map((article) => (
           <NewsCard key={article.id} article={article} />
         ))}
       </div>
 
       {/* Load More Button */}
-      {hasMore && (
+      {hasMore && filteredArticles.length > 0 && (
         <div className="text-center mt-8">
           <button
             onClick={handleLoadMore}
@@ -73,9 +115,14 @@ const NewsFeed: React.FC = () => {
         </div>
       )}
 
-      {articles.length === 0 && !loading && (
+      {filteredArticles.length === 0 && !loading && (
         <div className="text-center py-12">
-          <p className="text-gray-600">No articles available at the moment.</p>
+          <p className="text-gray-600">
+            {selectedCategory 
+              ? `No articles available in the "${getSelectedCategoryName()}" category.` 
+              : 'No articles available at the moment.'
+            }
+          </p>
         </div>
       )}
     </div>
