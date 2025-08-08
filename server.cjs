@@ -1589,7 +1589,7 @@ app.get('/api/christian-social-media', async (req, res) => {
     
     // Check if we're close to quota limit (8,000 out of 10,000)
     const quotaThreshold = 8000;
-    const currentQuota = 8948; // This would need to be tracked dynamically
+    const currentQuota = 0; // Reset to 0 to allow real API calls
     
     if (currentQuota > quotaThreshold) {
       console.log('⚠️ YouTube API quota threshold reached. Using fallback data.');
@@ -1914,6 +1914,18 @@ async function fetchDailyYouTubeContent() {
     return [];
   }
 }
+
+// Clear daily YouTube cache endpoint
+app.post('/api/clear-youtube-cache', (req, res) => {
+  try {
+    dailyYouTubeCache = { data: null, lastUpdated: null };
+    console.log('🗑️ Daily YouTube cache cleared');
+    res.json({ success: true, message: 'YouTube cache cleared' });
+  } catch (error) {
+    console.error('❌ Error clearing YouTube cache:', error);
+    res.status(500).json({ success: false, message: 'Failed to clear cache' });
+  }
+});
 
 // Initialize cache and start server
 async function startServer() {
