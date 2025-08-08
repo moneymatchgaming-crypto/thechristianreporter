@@ -28,6 +28,15 @@ export const getChristianYouTubeContent = async (): Promise<YouTubeVideo[]> => {
     return [];
   }
 
+  // Check for global daily cache (same videos for everyone)
+  const today = new Date().toDateString();
+  const cacheKey = `youtube-cache-${today}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    console.log('📦 Serving today\'s cached YouTube content');
+    return JSON.parse(cached);
+  }
+
   try {
     const videos: YouTubeVideo[] = [];
     
@@ -184,6 +193,13 @@ export const getChristianYouTubeContent = async (): Promise<YouTubeVideo[]> => {
     }
 
     console.log(`📊 Found ${videos.length} YouTube videos`);
+    
+    // Cache the results for today (same for everyone)
+    if (videos.length > 0) {
+      localStorage.setItem(cacheKey, JSON.stringify(videos));
+      console.log('💾 Cached today\'s YouTube content for all visitors');
+    }
+    
     return videos;
 
   } catch (error: any) {
