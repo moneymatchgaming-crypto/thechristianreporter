@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Heart, MessageCircle, ExternalLink, Youtube, Music } from 'lucide-react';
+import { getChristianYouTubeContent } from '../services/youtube-api';
 
 interface SocialMediaPost {
   id: string;
@@ -22,23 +23,21 @@ const ChristianSocialMedia: React.FC = () => {
   const [posts, setPosts] = useState<SocialMediaPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'youtube' | 'tiktok'>('all');
-  const [apiQuotaExceeded, setApiQuotaExceeded] = useState(false);
+
 
   useEffect(() => {
     const fetchSocialMediaContent = async () => {
       try {
         setLoading(true);
-        console.log('🔍 Fetching Christian social media content...');
-        const response = await fetch('/api/christian-social-media');
-        const data = await response.json();
-        console.log('✅ Received data:', data);
-        setPosts(data.posts || []);
+        console.log('🔍 Fetching Christian YouTube content from frontend...');
+        
+        // Use frontend YouTube API instead of backend
+        const videos = await getChristianYouTubeContent();
+        console.log('✅ Received YouTube videos:', videos);
+        setPosts(videos);
+        
       } catch (error) {
-        console.error('❌ Error fetching social media content:', error);
-        // Check if it's a quota exceeded error
-        if (error instanceof Error && error.message.includes('quota')) {
-          setApiQuotaExceeded(true);
-        }
+        console.error('❌ Error fetching YouTube content:', error);
         // Fallback data with Christian content (YouTube only)
         setPosts([
           {
@@ -159,16 +158,7 @@ const ChristianSocialMedia: React.FC = () => {
         </div>
       </div>
 
-      {apiQuotaExceeded && (
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-          <div className="flex items-center space-x-2">
-            <span className="text-yellow-600">⚠️</span>
-            <span className="text-sm text-yellow-800">
-              YouTube API quota exceeded. Showing example content. Real videos will appear when quota resets.
-            </span>
-          </div>
-        </div>
-      )}
+
 
       {filteredPosts.length === 0 ? (
         <div className="text-center py-8">
