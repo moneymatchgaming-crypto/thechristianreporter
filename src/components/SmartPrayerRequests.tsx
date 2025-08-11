@@ -50,45 +50,87 @@ const SmartPrayerRequests: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [requestsResponse, analyticsResponse] = await Promise.all([
-          fetch('/api/prayer-requests'),
-          fetch('/api/prayer-analytics')
-        ]);
         
-        const requestsData = await requestsResponse.json();
-        const analyticsData = await analyticsResponse.json();
+        // Load prayer requests from localStorage
+        const localRequests = JSON.parse(localStorage.getItem('localPrayerRequests') || '[]');
         
-        setRequests(requestsData.requests || []);
-        setAnalytics(analyticsData);
-
-        // Check server-side prayer status for each request
-        const serverPrayedRequests = new Set();
-        for (const request of requestsData.requests || []) {
-          try {
-            const statusResponse = await fetch(`/api/prayer-requests/${request.id}/status`);
-            if (statusResponse.ok) {
-              const status = await statusResponse.json();
-              if (status.hasPrayed) {
-                serverPrayedRequests.add(request.id);
-              }
+        // Combine local requests with fallback data if no local data exists
+        let allRequests = localRequests;
+        if (localRequests.length === 0) {
+          allRequests = [
+            {
+              id: '1',
+              title: 'Prayer for Healing',
+              description: 'Please pray for Sarah who is recovering from surgery.',
+              category: 'health',
+              urgency: 'high',
+              date: new Date().toISOString(),
+              anonymous: false,
+              prayerCount: 12
+            },
+            {
+              id: '2',
+              title: 'Mission Team Safety',
+              description: 'Praying for our mission team serving in Guatemala.',
+              category: 'missions',
+              urgency: 'medium',
+              date: new Date(Date.now() - 86400000).toISOString(),
+              anonymous: false,
+              prayerCount: 8
+            },
+            {
+              id: '3',
+              title: 'Family Reconciliation',
+              description: 'Praying for healing in family relationships.',
+              category: 'family',
+              urgency: 'medium',
+              date: new Date(Date.now() - 172800000).toISOString(),
+              anonymous: false,
+              prayerCount: 15
             }
-          } catch (error) {
-            console.error(`Error checking status for request ${request.id}:`, error);
-          }
+          ];
+          
+          // Save fallback data to localStorage
+          localStorage.setItem('localPrayerRequests', JSON.stringify(allRequests));
         }
-
-        // Merge server status with localStorage for better UX
+        
+        setRequests(allRequests);
+        
+        // Load prayed requests from localStorage
         const savedPrayedRequests = localStorage.getItem('prayedRequests');
-        const localPrayedRequests = savedPrayedRequests ? new Set(JSON.parse(savedPrayedRequests) as string[]) : new Set<string>();
+        if (savedPrayedRequests) {
+          const localPrayedRequests = new Set(JSON.parse(savedPrayedRequests) as string[]);
+          setPrayedRequests(localPrayedRequests);
+        }
         
-        // Combine server and local data
-        const combinedPrayedRequests = new Set<string>([...Array.from(serverPrayedRequests as Set<string>), ...Array.from(localPrayedRequests as Set<string>)]);
-        setPrayedRequests(combinedPrayedRequests);
+        // Calculate analytics from requests
+        const totalRequests = allRequests.length;
+        const recentActivity = allRequests.filter(req => {
+          const reqDate = new Date(req.date);
+          const now = new Date();
+          const diffInDays = (now.getTime() - reqDate.getTime()) / (1000 * 60 * 60 * 24);
+          return diffInDays <= 7;
+        }).length;
         
-        // Update localStorage with server data
-        localStorage.setItem('prayedRequests', JSON.stringify([...combinedPrayedRequests]));
+        const categoryCounts = allRequests.reduce((acc: { [key: string]: number }, req) => {
+          acc[req.category] = (acc[req.category] || 0) + 1;
+          return acc;
+        }, {});
+        
+        const topCategories = Object.entries(categoryCounts)
+          .map(([category, count]) => ({ category, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+        
+        setAnalytics({
+          totalRequests,
+          trendingTopics: ['healing', 'family', 'missions'],
+          recentActivity,
+          topCategories
+        });
+        
       } catch (error) {
-        console.error('Error fetching prayer data:', error);
+        console.error('Error loading prayer data:', error);
         // Fallback data
         setRequests([
           {
@@ -179,31 +221,43 @@ const SmartPrayerRequests: React.FC = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('/api/prayer-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Create new prayer request with unique ID
+      const newRequest: PrayerRequest = {
+        id: `prayer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        urgency: formData.urgency,
+        anonymous: formData.anonymous,
+        email: formData.email,
+        date: new Date().toISOString(),
+        prayerCount: 0
+      };
 
-      if (response.ok) {
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          category: 'general',
-          urgency: 'medium',
-          anonymous: false,
-          email: ''
-        });
-        setShowForm(false);
-        
-        // Refresh data
-        window.location.reload();
-      }
+      // Add to local requests
+      setRequests(prevRequests => [newRequest, ...prevRequests]);
+
+      // Save to localStorage
+      const existingRequests = JSON.parse(localStorage.getItem('localPrayerRequests') || '[]');
+      const updatedRequests = [newRequest, ...existingRequests];
+      localStorage.setItem('localPrayerRequests', JSON.stringify(updatedRequests));
+
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        category: 'general',
+        urgency: 'medium',
+        anonymous: false,
+        email: ''
+      });
+      setShowForm(false);
+      
+      // Show success message
+      alert('Prayer request submitted successfully!');
     } catch (error) {
       console.error('Error submitting prayer request:', error);
+      alert('Error submitting prayer request. Please try again.');
     }
   };
 
@@ -231,51 +285,22 @@ const SmartPrayerRequests: React.FC = () => {
       // Save to localStorage for immediate feedback
       localStorage.setItem('prayedRequests', JSON.stringify([...newPrayedRequests]));
 
-      // Send to backend
-      const response = await fetch(`/api/prayer-requests/${requestId}/pray`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+      // Update prayer count in localStorage
+      const existingRequests = JSON.parse(localStorage.getItem('localPrayerRequests') || '[]');
+      const updatedRequests = existingRequests.map((req: PrayerRequest) => 
+        req.id === requestId 
+          ? { ...req, prayerCount: req.prayerCount + 1 }
+          : req
+      );
+      localStorage.setItem('localPrayerRequests', JSON.stringify(updatedRequests));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        
-        // If server says already prayed, update local state
-        if (errorData.alreadyPrayed) {
-          const updatedPrayedRequests = new Set(prayedRequests);
-          updatedPrayedRequests.add(requestId);
-          setPrayedRequests(updatedPrayedRequests);
-          localStorage.setItem('prayedRequests', JSON.stringify([...updatedPrayedRequests]));
-          return;
-        }
-        
-        // Revert if other backend call fails
-        setRequests(prevRequests => 
-          prevRequests.map(req => 
-            req.id === requestId 
-              ? { ...req, prayerCount: req.prayerCount - 1 }
-              : req
-          )
-        );
-        
-        // Remove from prayed requests
-        const revertedPrayedRequests = new Set(prayedRequests);
-        revertedPrayedRequests.delete(requestId);
-        setPrayedRequests(revertedPrayedRequests);
-        localStorage.setItem('prayedRequests', JSON.stringify([...revertedPrayedRequests]));
-      } else {
-        // Success - server response includes updated count
-        const result = await response.json();
-        setRequests(prevRequests => 
-          prevRequests.map(req => 
-            req.id === requestId 
-              ? { ...req, prayerCount: result.prayerCount }
-              : req
-          )
-        );
-      }
+      // Update analytics
+      setAnalytics(prev => ({
+        ...prev,
+        totalRequests: prev.totalRequests,
+        recentActivity: prev.recentActivity + 1
+      }));
+
     } catch (error) {
       console.error('Error updating prayer count:', error);
       // Revert on error

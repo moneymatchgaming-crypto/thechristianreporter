@@ -70,41 +70,101 @@ export const getNews = async (): Promise<NewsArticle[]> => {
     const RSS2JSON_API_KEY = import.meta.env.VITE_RSS2JSON_API_KEY || 'YOUR_API_KEY_HERE';
     
     console.log('🔑 RSS2JSON API Key status:', RSS2JSON_API_KEY === 'YOUR_API_KEY_HERE' ? 'NOT CONFIGURED' : 'CONFIGURED');
+    console.log('🔑 API Key length:', RSS2JSON_API_KEY.length);
     
     if (RSS2JSON_API_KEY !== 'YOUR_API_KEY_HERE') {
       // Use RSS2JSON API (like crypto-news)
-      const feedPromises = CHRISTIAN_RSS_FEEDS.map(async (feed, index) => {
+      console.log('📡 Starting RSS2JSON API calls...');
+      const feedPromises = CHRISTIAN_RSS_FEEDS.slice(0, 8).map(async (feed, index) => {
         try {
+          console.log(`📡 Fetching ${feed.name} (${feed.url})...`);
           const response = await axios.get('https://api.rss2json.com/v1/api.json', {
             params: {
               rss_url: feed.url,
               api_key: RSS2JSON_API_KEY,
-              count: 10
+              count: 5
             },
-            timeout: 10000
+            timeout: 15000
           });
           
+          console.log(`📡 Response for ${feed.name}:`, response.status, response.data?.status);
+          
           if (response.data && response.data.status === 'ok' && response.data.items) {
-            return parseRSSFromJSON(response.data, feed, index);
+            const articles = parseRSSFromJSON(response.data, feed, index);
+            console.log(`✅ ${feed.name}: Got ${articles.length} articles`);
+            return articles;
+          } else if (response.data && response.data.status === 'error') {
+            console.log(`❌ ${feed.name}: RSS2JSON error - ${response.data.message}`);
+          } else {
+            console.log(`❌ ${feed.name}: Unexpected response format`);
           }
         } catch (error: any) {
-          console.log(`Failed to fetch ${feed.name}:`, error.message);
+          console.log(`❌ Failed to fetch ${feed.name}:`, error.message);
+          if (error.response) {
+            console.log(`❌ Response status: ${error.response.status}`);
+            console.log(`❌ Response data:`, error.response.data);
+          }
         }
         return [];
       });
       
       const results = await Promise.allSettled(feedPromises);
+      console.log(`📊 RSS2JSON results: ${results.length} promises settled`);
+      
+      const allArticles = results
+        .filter(result => result.status === 'fulfilled')
+        .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
+        .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+      
+      console.log(`📰 Total articles from RSS2JSON: ${allArticles.length}`);
+      
+      if (allArticles.length > 0) {
+        console.log(`📰 Successfully fetched ${allArticles.length} articles from RSS2JSON`);
+        return allArticles;
+      } else {
+        console.log('⚠️ RSS2JSON returned 0 articles, trying fallbacks...');
+      }
+    } else {
+      console.log('⚠️ RSS2JSON API key not configured. Trying free alternatives...');
+    }
+    
+    // Try free RSS2JSON service (limited but works)
+    try {
+      console.log('🔄 Trying free RSS2JSON service...');
+      const freeFeedPromises = CHRISTIAN_RSS_FEEDS.slice(0, 3).map(async (feed, index) => {
+        try {
+          console.log(`📡 Free service: Fetching ${feed.name}...`);
+          const response = await axios.get('https://api.rss2json.com/v1/api.json', {
+            params: {
+              rss_url: feed.url,
+              count: 3
+            },
+            timeout: 20000
+          });
+          
+          if (response.data && response.data.status === 'ok' && response.data.items) {
+            const articles = parseRSSFromJSON(response.data, feed, index);
+            console.log(`✅ Free service: ${feed.name} got ${articles.length} articles`);
+            return articles;
+          }
+        } catch (error: any) {
+          console.log(`❌ Free RSS2JSON failed for ${feed.name}:`, error.message);
+        }
+        return [];
+      });
+      
+      const results = await Promise.allSettled(freeFeedPromises);
       const allArticles = results
         .filter(result => result.status === 'fulfilled')
         .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
         .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
       
       if (allArticles.length > 0) {
-        console.log(`📰 Fetched ${allArticles.length} articles from RSS2JSON`);
+        console.log(`📰 Free RSS2JSON: Got ${allArticles.length} articles`);
         return allArticles;
       }
-    } else {
-      console.log('⚠️ RSS2JSON API key not configured. Please add VITE_RSS2JSON_API_KEY to your environment variables.');
+    } catch (error: any) {
+      console.log('Free RSS2JSON service failed:', error.message);
     }
     
   } catch (error: any) {
@@ -124,7 +184,7 @@ export const getNews = async (): Promise<NewsArticle[]> => {
       'https://cors.eu.org/'
     ];
     
-    const newsPromises = CHRISTIAN_RSS_FEEDS.map(async (feed, feedIndex) => {
+    const newsPromises = CHRISTIAN_RSS_FEEDS.slice(0, 3).map(async (feed, feedIndex) => {
       // Try CORS proxies for each feed
       for (const proxy of CORS_PROXIES) {
         try {
@@ -585,6 +645,76 @@ const getEnhancedSampleNews = (): NewsArticle[] => {
       source: 'Global Missions Report',
       category: 'missions',
       imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-4',
+      title: 'Youth Ministry Conference Draws Record Attendance',
+      description: 'Over 1,000 youth leaders gathered for the annual conference focused on engaging young people in faith and building stronger communities.',
+      link: 'https://example.com/youth-conference',
+      pubDate: new Date(Date.now() - 259200000).toISOString(),
+      source: 'Relevant Magazine',
+      category: 'youth',
+      imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-5',
+      title: 'Christian Business Leaders Launch Mentorship Program',
+      description: 'A new initiative connects experienced Christian business professionals with young entrepreneurs, providing guidance and spiritual support.',
+      link: 'https://example.com/business-mentorship',
+      pubDate: new Date(Date.now() - 345600000).toISOString(),
+      source: 'Christian Business Network',
+      category: 'professionals',
+      imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-6',
+      title: 'Family Ministry Focuses on Strong Marriages',
+      description: 'New program helps couples build stronger relationships through biblical principles and professional counseling services.',
+      link: 'https://example.com/marriage-program',
+      pubDate: new Date(Date.now() - 432000000).toISOString(),
+      source: 'Focus on the Family',
+      category: 'family',
+      imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-7',
+      title: 'Christian Apologetics Conference Addresses Modern Challenges',
+      description: 'Leading scholars and speakers gathered to discuss how to defend the Christian faith in today\'s increasingly secular culture.',
+      link: 'https://example.com/apologetics-conference',
+      pubDate: new Date(Date.now() - 518400000).toISOString(),
+      source: 'Christian Apologetics Network',
+      category: 'apologetics',
+      imageUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-8',
+      title: 'Women\'s Ministry Launches Online Bible Study',
+      description: 'New virtual platform brings together women from around the world for weekly Bible study and spiritual growth.',
+      link: 'https://example.com/womens-bible-study',
+      pubDate: new Date(Date.now() - 604800000).toISOString(),
+      source: 'Women of Faith',
+      category: 'women',
+      imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-9',
+      title: 'Christian Music Festival Celebrates 25th Anniversary',
+      description: 'Annual event brings together top Christian artists and thousands of worshippers for a weekend of music and ministry.',
+      link: 'https://example.com/music-festival',
+      pubDate: new Date(Date.now() - 691200000).toISOString(),
+      source: 'CCM Magazine',
+      category: 'music',
+      imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=400&fit=crop'
+    },
+    {
+      id: 'sample-10',
+      title: 'Theological Seminary Expands Online Programs',
+      description: 'Leading Christian seminary announces new online degree programs to make theological education more accessible.',
+      link: 'https://example.com/seminary-online',
+      pubDate: new Date(Date.now() - 777600000).toISOString(),
+      source: 'Theological Education Today',
+      category: 'theology',
+      imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=400&fit=crop'
     }
   ];
 }; 
