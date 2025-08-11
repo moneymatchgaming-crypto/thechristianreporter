@@ -373,6 +373,24 @@ const extractImageFromContent = (content: string): string | null => {
 
 // Get placeholder image (like crypto-news)
 const getPlaceholderImage = (category: string): string => {
+  // Array of beautiful stained glass images from Unsplash
+  const stainedGlassImages = [
+    'https://images.unsplash.com/photo-1548092462-d49ec1620276?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1550541231-56ddb7f844ec?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1584476037416-2c251d2b0bda?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1632230997264-b2bfc65cb8b4?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1517340182-ddc4e441b011?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1447858496759-dd23e166e1c5?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1543817625-3cbb6d1a6e32?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1579127499396-1fc18048a068?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1534842471718-d2c5afe852af?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1577222512383-ed8bb23c0f2d?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1700515968122-bbf480e158ac?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1555679432-b7b7a5e3680c?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1593647971669-68417429a6d3?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1521852227471-4e6a119d15d4?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+  ];
+
   // Array of beautiful Christian-themed images from Unsplash
   const christianImages = [
     'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop',
@@ -392,18 +410,22 @@ const getPlaceholderImage = (category: string): string => {
     'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=400&fit=crop'
   ];
   
-  // For church-themed categories, prioritize Christian images (70% chance)
-  const churchThemedCategories = ['church', 'catholic', 'orthodox', 'methodist', 'episcopal', 'lutheran', 'ucc', 'adventist', 'pentecostal', 'faith', 'prayer', 'bible-study', 'theology', 'worship'];
+  // For faith-themed categories, prioritize stained glass images (80% chance)
+  const faithThemedCategories = ['church', 'catholic', 'orthodox', 'methodist', 'episcopal', 'lutheran', 'ucc', 'adventist', 'pentecostal', 'faith', 'prayer', 'bible-study', 'theology', 'worship', 'missions', 'apologetics'];
   
-  if (churchThemedCategories.includes(category.toLowerCase())) {
-    // 70% chance for Christian images, 30% for regular placeholders
-    if (Math.random() < 0.7) {
+  if (faithThemedCategories.includes(category.toLowerCase())) {
+    // 80% chance for stained glass, 20% for Christian images
+    if (Math.random() < 0.8) {
+      return stainedGlassImages[Math.floor(Math.random() * stainedGlassImages.length)];
+    } else {
       return christianImages[Math.floor(Math.random() * christianImages.length)];
     }
   }
   
-  // For all categories, mix Christian images with regular images (30% chance for Christian images)
-  if (Math.random() < 0.3) {
+  // For all categories, mix stained glass with Christian images (40% chance for stained glass, 30% for Christian images)
+  if (Math.random() < 0.4) {
+    return stainedGlassImages[Math.floor(Math.random() * stainedGlassImages.length)];
+  } else if (Math.random() < 0.3) {
     return christianImages[Math.floor(Math.random() * christianImages.length)];
   }
   
