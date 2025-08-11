@@ -105,21 +105,21 @@ const SmartPrayerRequests: React.FC = () => {
         
         // Calculate analytics from requests
         const totalRequests = allRequests.length;
-        const recentActivity = allRequests.filter(req => {
+        const recentActivity = allRequests.filter((req: PrayerRequest) => {
           const reqDate = new Date(req.date);
           const now = new Date();
           const diffInDays = (now.getTime() - reqDate.getTime()) / (1000 * 60 * 60 * 24);
           return diffInDays <= 7;
         }).length;
         
-        const categoryCounts = allRequests.reduce((acc: { [key: string]: number }, req) => {
+        const categoryCounts = allRequests.reduce((acc: { [key: string]: number }, req: PrayerRequest) => {
           acc[req.category] = (acc[req.category] || 0) + 1;
           return acc;
         }, {});
         
         const topCategories = Object.entries(categoryCounts)
-          .map(([category, count]) => ({ category, count }))
-          .sort((a, b) => b.count - a.count)
+          .map(([category, count]) => ({ category, count: count as number }))
+          .sort((a, b) => (b.count as number) - (a.count as number))
           .slice(0, 5);
         
         setAnalytics({
@@ -295,11 +295,14 @@ const SmartPrayerRequests: React.FC = () => {
       localStorage.setItem('localPrayerRequests', JSON.stringify(updatedRequests));
 
       // Update analytics
-      setAnalytics(prev => ({
-        ...prev,
-        totalRequests: prev.totalRequests,
-        recentActivity: prev.recentActivity + 1
-      }));
+      setAnalytics(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          totalRequests: prev.totalRequests,
+          recentActivity: prev.recentActivity + 1
+        };
+      });
 
     } catch (error) {
       console.error('Error updating prayer count:', error);
