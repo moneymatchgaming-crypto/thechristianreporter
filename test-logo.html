@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Test</title>
+</head>
+<body>
+    <h1>Logo Image Test</h1>
+    
+    <h2>Test 1: Relative path</h2>
+    <img src="images/CR-logo-2025.png" alt="Test 1" style="width: 200px; height: 100px; border: 1px solid red;">
+    
+    <h2>Test 2: Absolute path</h2>
+    <img src="/images/CR-logo-2025.png" alt="Test 2" style="width: 200px; height: 100px; border: 1px solid blue;">
+    
+    <h2>Test 3: Public folder path</h2>
+    <img src="./images/CR-logo-2025.png" alt="Test 3" style="width: 200px; height: 100px; border: 1px solid green;">
+    
+    <h2>Test 4: Parent directory</h2>
+    <img src="../images/CR-logo-2025.png" alt="Test 4" style="width: 200px; height: 100px; border: 1px solid orange;">
+    
+    <script>
+        // Check which images loaded successfully
+        document.querySelectorAll('img').forEach((img, index) => {
+            img.onload = () => {
+                console.log(`Image ${index + 1} loaded successfully:`, img.src);
+            };
+            img.onerror = () => {
+                console.error(`Image ${index + 1} failed to load:`, img.src);
+            };
+        });
+    </script>
+</body>
+</html>

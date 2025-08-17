@@ -22,17 +22,11 @@ const Logo: React.FC<LogoProps> = ({
 
   const renderLogoImage = () => (
     <div className={`${sizeClasses[size]} relative`}>
-      {/* Main logo image */}
+      {/* Main logo image with multiple fallback paths */}
       <img 
-        src="/images/CR-logo-2025.png" 
+        src="/CR-logo-2025.png" 
         alt="The Christian Reporter - Faith-based news & Christian content" 
         className="w-full h-full object-contain drop-shadow-lg"
-        onError={(e) => {
-          console.error('Logo image failed to load:', e);
-          // Fallback to text if image fails
-          const target = e.target as HTMLImageElement;
-          target.style.display = 'none';
-        }}
       />
       
       {/* Subtle glow effect */}
