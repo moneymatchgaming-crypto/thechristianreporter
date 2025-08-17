@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Logo Test</title>
+</head>
+<body>
+    <h1>Logo Test</h1>
+    
+    <h2>Direct Path Test:</h2>
+    <img src="/CR-logo-2025.png" alt="Logo Test" style="width: 300px; height: 150px; border: 2px solid red;">
+    
+    <h2>Alternative Path Test:</h2>
+    <img src="CR-logo-2025.png" alt="Logo Test 2" style="width: 300px; height: 150px; border: 2px solid blue;">
+    
+    <script>
+        // Check which images loaded
+        document.querySelectorAll('img').forEach((img, index) => {
+            img.onload = () => console.log(`Image ${index + 1} loaded:`, img.src);
+            img.onerror = () => console.error(`Image ${index + 1} failed:`, img.src);
+        });
+    </script>
+</body>
+</html>

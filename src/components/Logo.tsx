@@ -10,35 +10,32 @@ interface LogoProps {
 const Logo: React.FC<LogoProps> = ({ 
   variant = 'default', 
   size = 'md', 
-  className = '',
+  className = '', 
   onClick 
 }) => {
   const sizeClasses = {
-    sm: 'w-16 h-8',
-    md: 'w-24 h-12',
-    lg: 'w-32 h-16',
-    xl: 'w-40 h-20'
+    sm: 'w-52 h-26',
+    md: 'w-72 h-36',
+    lg: 'w-104 h-52',
+    xl: 'w-128 h-64'
   };
 
   const renderLogoImage = () => (
-    <div className={`${sizeClasses[size]} relative`}>
-      {/* Main logo image with multiple fallback paths */}
+    <div className={`${sizeClasses[size]} relative p-0 m-0`}>
+      {/* Main logo image */}
       <img 
-        src="/CR-logo-2025.png" 
+        src="/CR-logo-2025-2.png" 
         alt="The Christian Reporter - Faith-based news & Christian content" 
-        className="w-full h-full object-contain drop-shadow-lg"
+        className="w-full h-full object-contain drop-shadow-lg p-0 m-0"
       />
-      
-      {/* Subtle glow effect */}
-      <div className="absolute inset-0 bg-primary-400 rounded-full blur-md opacity-20 animate-pulse"></div>
     </div>
   );
 
   const renderCompactLogo = () => (
-    <div className="flex items-center space-x-3">
+    <div className="flex flex-col items-center p-0 m-0">
       {renderLogoImage()}
-      <div className="flex flex-col">
-        <p className="text-sm text-gray-600 font-medium">
+      <div className="text-center p-0 m-0 -mt-1">
+        <p className="text-xl text-gray-600 font-medium p-0 m-0">
           Faith-based news
         </p>
       </div>
@@ -46,10 +43,10 @@ const Logo: React.FC<LogoProps> = ({
   );
 
   const renderDefaultLogo = () => (
-    <div className="flex items-center space-x-4">
+    <div className="flex flex-col items-center p-0 m-0">
       {renderLogoImage()}
-      <div className="flex flex-col">
-        <p className="text-sm text-gray-600 font-medium">
+      <div className="text-center p-0 m-0 -mt-1">
+        <p className="text-xl text-gray-600 font-medium p-0 m-0">
           Faith-based news & Christian content
         </p>
       </div>

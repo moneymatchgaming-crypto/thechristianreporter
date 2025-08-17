@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Logo Test</title>
+</head>
+<body>
+    <h1>Testing Logo Loading</h1>
+    
+    <h2>Logo Test:</h2>
+    <img src="/CR-logo-2025.png" alt="Logo Test" style="width: 400px; height: 200px; border: 3px solid green;">
+    
+    <h2>Favicon Test:</h2>
+    <img src="/TCR-favicon.png" alt="Favicon Test" style="width: 100px; height: 100px; border: 3px solid blue;">
+    
+    <script>
+        // Test image loading
+        const logo = document.querySelector('img[src="/CR-logo-2025.png"]');
+        const favicon = document.querySelector('img[src="/TCR-favicon.png"]');
+        
+        logo.onload = () => console.log('✅ Logo loaded successfully!');
+        logo.onerror = () => console.error('❌ Logo failed to load');
+        
+        favicon.onload = () => console.log('✅ Favicon loaded successfully!');
+        favicon.onerror = () => console.error('❌ Favicon failed to load');
+    </script>
+</body>
+</html>
