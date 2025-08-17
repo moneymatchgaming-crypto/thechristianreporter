@@ -1,4 +1,5 @@
 import React from 'react';
+import logoUrl from '/logo.png';
 
 interface LogoProps {
   variant?: 'default' | 'compact' | 'icon-only';
@@ -24,7 +25,7 @@ const Logo: React.FC<LogoProps> = ({
     <div className={`${sizeClasses[size]} relative p-0 m-0`}>
       {/* Main logo image */}
       <img 
-        src="/logo.png" 
+        src={logoUrl || "/logo.png"} 
         alt="The Christian Reporter - Faith-based news & Christian content" 
         className="w-full h-full object-contain drop-shadow-lg p-0 m-0"
       />
