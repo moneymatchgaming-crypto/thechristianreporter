@@ -24,7 +24,7 @@ const Logo: React.FC<LogoProps> = ({
     <div className={`${sizeClasses[size]} relative p-0 m-0`}>
       {/* Main logo image */}
       <img 
-        src="CR-logo-2025-2.png" 
+        src="/logo.png" 
         alt="The Christian Reporter - Faith-based news & Christian content" 
         className="w-full h-full object-contain drop-shadow-lg p-0 m-0"
       />
