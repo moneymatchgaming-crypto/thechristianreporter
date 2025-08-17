@@ -24,11 +24,49 @@ const EventsCalendar: React.FC = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/events');
-        const data = await response.json();
-        setEvents(data.events || []);
+        
+        // Load events from localStorage
+        const localEvents = JSON.parse(localStorage.getItem('localEvents') || '[]');
+        
+        // Use local events if available, otherwise use fallback data
+        let allEvents = localEvents;
+        if (localEvents.length === 0) {
+          allEvents = [
+            {
+              id: "1",
+              title: "Youth Group Bible Study",
+              description: "Weekly Bible study for high school students. We'll be studying the book of Romans.",
+              date: "2025-08-15",
+              time: "18:00",
+              duration: 90,
+              location: "Church Fellowship Hall",
+              ministry: "youth",
+              contact: "Pastor Mike",
+              registration: false,
+              recurring: "weekly"
+            },
+            {
+              id: "2",
+              title: "Worship Team Practice",
+              description: "Weekly worship team rehearsal for Sunday service",
+              date: "2025-08-16",
+              time: "19:00",
+              duration: 120,
+              location: "Sanctuary",
+              ministry: "worship",
+              contact: "Music Director Sarah",
+              registration: false,
+              recurring: "weekly"
+            }
+          ];
+          
+          // Save fallback data to localStorage
+          localStorage.setItem('localEvents', JSON.stringify(allEvents));
+        }
+        
+        setEvents(allEvents);
       } catch (error) {
-        console.error('Error fetching events:', error);
+        console.error('Error loading events:', error);
         // Fallback to sample data
         setEvents([
           {
