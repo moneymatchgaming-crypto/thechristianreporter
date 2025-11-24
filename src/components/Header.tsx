@@ -21,8 +21,8 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
     <header className="bg-white shadow-lg border-b border-primary-200">
       <div className="container mx-auto px-4 py-6">
         {/* Main Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-          <div className="flex items-center justify-center w-full md:w-auto mb-4 md:mb-0">
+        <div className="flex flex-col items-center justify-center mb-6">
+          <div className="flex items-center justify-center w-full mb-4">
             <Logo 
               variant="default" 
               size="lg" 
@@ -33,12 +33,12 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
 
           {/* Cache Status */}
           {cacheStatus && (
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
               <div className="flex items-center space-x-2">
                 <RefreshCw className="w-4 h-4 text-primary-600" />
                 <span>Last updated: {formatTime(cacheStatus.lastUpdated)}</span>
               </div>
-              <div className="hidden md:flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <BookOpen className="w-4 h-4 text-faith-600" />
                 <span>{cacheStatus.totalArticles} articles</span>
               </div>
@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-wrap items-center justify-end space-x-8 text-sm font-medium">
+        <nav className="flex flex-wrap items-center justify-center space-x-8 text-sm font-medium">
           <a href="#news" className="flex items-center space-x-2 text-primary-700 hover:text-primary-900 transition-colors">
             <BookOpen className="w-4 h-4" />
             <span>News</span>
