@@ -22,7 +22,7 @@ const Logo: React.FC<LogoProps> = ({
 
   const renderLogoImage = () => (
     <div className={`${sizeClasses[size]} relative p-0 m-0`}>
-      {/* Main logo image */}
+      {/* Main logo image - using public folder asset */}
       <img 
         src="/CR-logo-2025.png" 
         alt="The Christian Reporter - Faith-based news & Christian content" 
