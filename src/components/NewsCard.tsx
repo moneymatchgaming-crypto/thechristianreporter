@@ -57,6 +57,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
           <img
             src={article.imageUrl}
             alt={article.title}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
             onError={(e) => {
               const target = e.target as HTMLImageElement;

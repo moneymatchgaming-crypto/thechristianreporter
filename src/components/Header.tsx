@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-wrap items-center justify-center space-x-8 text-sm font-medium">
+        <nav className="flex flex-wrap items-center justify-end space-x-8 text-sm font-medium">
           <a href="#news" className="flex items-center space-x-2 text-primary-700 hover:text-primary-900 transition-colors">
             <BookOpen className="w-4 h-4" />
             <span>News</span>

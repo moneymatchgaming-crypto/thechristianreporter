@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import NewsFeed from './components/NewsFeed';
@@ -8,11 +8,13 @@ import DailyVerse from './components/DailyVerse';
 import EventsCalendar from './components/EventsCalendar';
 import ChristianSocialMedia from './components/ChristianSocialMedia';
 import Footer from './components/Footer';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
-import Disclaimer from './pages/Disclaimer';
 import { NewsArticle } from './types';
 import { getNews } from './services/api';
+
+// Lazy load non-critical routes for better initial load performance
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+const Disclaimer = lazy(() => import('./pages/Disclaimer'));
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -152,12 +154,21 @@ function App() {
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Header />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/disclaimer" element={<Disclaimer />} />
-          </Routes>
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading...</p>
+              </div>
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
+            </Routes>
+          </Suspense>
           <Footer />
         </div>
       </Router>

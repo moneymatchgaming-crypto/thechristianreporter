@@ -177,6 +177,7 @@ const ChristianSocialMedia: React.FC = () => {
                       <img 
                         src={post.thumbnail} 
                         alt={post.title}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -235,6 +236,7 @@ const ChristianSocialMedia: React.FC = () => {
                       <img 
                         src={post.authorAvatar} 
                         alt={post.author}
+                        loading="lazy"
                         className="w-6 h-6 rounded-full"
                       />
                     )}
