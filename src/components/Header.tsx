@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ cacheStatus }) => {
       <div className="container mx-auto px-4 py-6">
         {/* Main Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
+          <div className="flex items-center justify-center w-full md:w-auto mb-4 md:mb-0">
             <Logo 
               variant="default" 
               size="lg" 

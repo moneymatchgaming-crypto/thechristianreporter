@@ -21,7 +21,7 @@ const Logo: React.FC<LogoProps> = ({
   };
 
   const renderLogoImage = () => (
-    <div className={`${sizeClasses[size]} relative p-0 m-0`}>
+    <div className={`${sizeClasses[size]} relative p-0 m-0 mx-auto`}>
       {/* Main logo image - using public folder asset */}
       <img 
         src="/CR-logo-2025.png" 
@@ -32,9 +32,11 @@ const Logo: React.FC<LogoProps> = ({
   );
 
   const renderCompactLogo = () => (
-    <div className="flex flex-col items-center p-0 m-0">
-      {renderLogoImage()}
-      <div className="text-center p-0 m-0 -mt-1">
+    <div className="flex flex-col items-center justify-center p-0 m-0 w-full">
+      <div className="flex justify-center w-full">
+        {renderLogoImage()}
+      </div>
+      <div className="text-center p-0 m-0 -mt-1 w-full">
         <p className="text-xl text-gray-600 font-medium p-0 m-0">
           Faith-based news
         </p>
@@ -43,9 +45,11 @@ const Logo: React.FC<LogoProps> = ({
   );
 
   const renderDefaultLogo = () => (
-    <div className="flex flex-col items-center p-0 m-0">
-      {renderLogoImage()}
-      <div className="text-center p-0 m-0 -mt-1">
+    <div className="flex flex-col items-center justify-center p-0 m-0 w-full">
+      <div className="flex justify-center w-full">
+        {renderLogoImage()}
+      </div>
+      <div className="text-center p-0 m-0 -mt-1 w-full">
         <p className="text-xl text-gray-600 font-medium p-0 m-0">
           Faith-based news & Christian content
         </p>
