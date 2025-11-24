@@ -66,7 +66,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public - commented out for Vite projects (public folder needs to be tracked)
 
 # Storybook build outputs
 .out
