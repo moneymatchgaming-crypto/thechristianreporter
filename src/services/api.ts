@@ -61,7 +61,69 @@ const CHRISTIAN_RSS_FEEDS = [
   { name: 'Christianity Today Global', url: 'https://www.christianitytoday.com/global/feed', category: 'missions' }
 ];
 
-// News API - using RSS2JSON like crypto-news
+// Fast loading API - only loads limited articles from fewer feeds (like crypto-news)
+export const getNewsFast = async (limit: number = 12): Promise<{ articles: NewsArticle[], total: number }> => {
+  console.log(`🚀 Fast loading: Fetching ${limit} articles from priority feeds...`);
+  
+  try {
+    // Try RSS2JSON API with API key (like crypto-news)
+    const RSS2JSON_API_KEY = import.meta.env.VITE_RSS2JSON_API_KEY || 'YOUR_API_KEY_HERE';
+    
+    if (RSS2JSON_API_KEY !== 'YOUR_API_KEY_HERE') {
+      // Use only first 4 feeds for fast loading (fewer than getNews which uses 8)
+      const fastFeeds = CHRISTIAN_RSS_FEEDS.slice(0, 4);
+      const feedPromises = fastFeeds.map(async (feed, index) => {
+        try {
+          const response = await axios.get('https://api.rss2json.com/v1/api.json', {
+            params: {
+              rss_url: feed.url,
+              api_key: RSS2JSON_API_KEY,
+              count: 5 // Get 5 per feed to have enough for pagination
+            },
+            timeout: 10000
+          });
+          
+          if (response.data && response.data.status === 'ok' && response.data.items) {
+            return parseRSSFromJSON(response.data, feed, index);
+          }
+        } catch (error: any) {
+          console.log(`❌ Fast load failed for ${feed.name}:`, error.message);
+        }
+        return [];
+      });
+      
+      const results = await Promise.allSettled(feedPromises);
+      const allArticles = results
+        .filter(result => result.status === 'fulfilled')
+        .flatMap(result => (result as PromiseFulfilledResult<NewsArticle[]>).value)
+        .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+      
+      if (allArticles.length > 0) {
+        // Return only the requested limit, but provide total count
+        const firstPageArticles = allArticles.slice(0, limit);
+        console.log(`📰 Fast load: Got ${firstPageArticles.length} articles (${allArticles.length} total available)`);
+        return { articles: firstPageArticles, total: allArticles.length };
+      }
+    }
+  } catch (error: any) {
+    console.log('Fast load RSS2JSON failed:', error.message);
+  }
+  
+  // Fallback to regular getNews but limit results
+  try {
+    const allArticles = await getNews();
+    const limitedArticles = allArticles.slice(0, limit);
+    console.log(`📰 Fast load fallback: Returning ${limitedArticles.length} articles`);
+    return { articles: limitedArticles, total: allArticles.length };
+  } catch (error: any) {
+    console.error('Fast load fallback failed:', error.message);
+    // Final fallback: sample data
+    const sampleNews = getEnhancedSampleNews();
+    return { articles: sampleNews.slice(0, limit), total: sampleNews.length };
+  }
+};
+
+// News API - using RSS2JSON like crypto-news (loads all articles)
 export const getNews = async (): Promise<NewsArticle[]> => {
   console.log('🚀 Fetching Christian news from RSS feeds...');
   

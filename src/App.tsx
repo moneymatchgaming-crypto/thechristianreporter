@@ -9,7 +9,7 @@ import EventsCalendar from './components/EventsCalendar';
 import ChristianSocialMedia from './components/ChristianSocialMedia';
 import Footer from './components/Footer';
 import { NewsArticle } from './types';
-import { getNews } from './services/api';
+import { getNewsFast } from './services/api';
 
 // Lazy load non-critical routes for better initial load performance
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -72,8 +72,9 @@ const HomePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('📰 App: Fetching news for jumbotron...');
-      const newsArticles = await getNews();
+      console.log('📰 App: Fast loading news for jumbotron...');
+      // Use fast loading - only get 5 articles for carousel
+      const { articles: newsArticles } = await getNewsFast(5);
       console.log('📰 App: Loaded', newsArticles.length, 'articles for jumbotron');
       setArticles(newsArticles);
     } catch (err: any) {

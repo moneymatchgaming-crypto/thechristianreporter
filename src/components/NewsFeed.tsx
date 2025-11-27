@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NewsArticle } from '../types';
 import NewsCard from './NewsCard';
 import { ChevronDown, Filter } from 'lucide-react';
-import { getNews } from '../services/api';
+import { getNews, getNewsFast } from '../services/api';
 import { getCategoriesInGroup, categoryGroups } from '../utils/categoryGroups';
 
 interface NewsFeedProps {
@@ -23,28 +23,36 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ selectedCategory }) => {
       setError(null);
       console.log('📰 NewsFeed: Fetching articles for page', pageNum);
       
-      // Use the new API service with pagination simulation
-      const allArticles = await getNews();
-      
-      if (!allArticles || allArticles.length === 0) {
-        throw new Error('No articles received from API');
-      }
-      
-      // Simulate pagination: show 12 articles per page
-      const articlesPerPage = 12;
-      const startIndex = (pageNum - 1) * articlesPerPage;
-      const endIndex = startIndex + articlesPerPage;
-      const pageArticles = allArticles.slice(startIndex, endIndex);
-      
       if (pageNum === 1) {
+        // Fast load for initial page - only 12 articles from fewer feeds
+        const { articles: pageArticles, total } = await getNewsFast(12);
+        
+        if (!pageArticles || pageArticles.length === 0) {
+          throw new Error('No articles received from API');
+        }
+        
         setArticles(pageArticles);
+        // Assume there are more articles if we got 12 (might have more)
+        setHasMore(total > 12 || pageArticles.length === 12);
+        console.log('📰 NewsFeed: Fast loaded', pageArticles.length, 'articles for page 1');
       } else {
+        // For subsequent pages, load all articles and paginate
+        const allArticles = await getNews();
+        
+        if (!allArticles || allArticles.length === 0) {
+          throw new Error('No articles received from API');
+        }
+        
+        // Pagination: show 12 articles per page
+        const articlesPerPage = 12;
+        const startIndex = (pageNum - 1) * articlesPerPage;
+        const endIndex = startIndex + articlesPerPage;
+        const pageArticles = allArticles.slice(startIndex, endIndex);
+        
         setArticles(prev => [...prev, ...pageArticles]);
+        setHasMore(endIndex < allArticles.length);
+        console.log('📰 NewsFeed: Loaded', pageArticles.length, 'articles for page', pageNum);
       }
-      
-      // Check if there are more articles
-      setHasMore(endIndex < allArticles.length);
-      console.log('📰 NewsFeed: Loaded', pageArticles.length, 'articles for page', pageNum);
     } catch (err: any) {
       console.error('Error fetching news:', err);
       setError(err.message || 'Failed to fetch news articles');
